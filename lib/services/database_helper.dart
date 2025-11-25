@@ -17,7 +17,7 @@ class DatabaseHelper {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 2, onCreate: _createDB, onUpgrade: _onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
@@ -30,7 +30,7 @@ class DatabaseHelper {
       )
     ''');
     
-    // Tabel Favorit
+    // Tabel Favorit dengan field tambahan
     await db.execute('''
       CREATE TABLE favorites (
         id TEXT PRIMARY KEY,
@@ -39,9 +39,23 @@ class DatabaseHelper {
         overview TEXT,
         releaseDate TEXT,
         voteAverage REAL,
-        genre TEXT
+        genre TEXT,
+        director TEXT,
+        cast TEXT,
+        language TEXT,
+        duration TEXT
       )
     ''');
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Tambah kolom baru jika upgrade dari versi lama
+      await db.execute('ALTER TABLE favorites ADD COLUMN director TEXT');
+      await db.execute('ALTER TABLE favorites ADD COLUMN cast TEXT');
+      await db.execute('ALTER TABLE favorites ADD COLUMN language TEXT');
+      await db.execute('ALTER TABLE favorites ADD COLUMN duration TEXT');
+    }
   }
 
   // --- Logic User ---
@@ -74,15 +88,7 @@ class DatabaseHelper {
   Future<List<Movie>> getFavorites() async {
     final db = await instance.database;
     final result = await db.query('favorites');
-    return result.map((json) => Movie(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      posterPath: json['posterPath'] as String,
-      overview: json['overview'] as String,
-      releaseDate: json['releaseDate'] as String,
-      voteAverage: json['voteAverage'] as double,
-      genre: json['genre'] as String,
-    )).toList();
+    return result.map((json) => Movie.fromMap(json)).toList();
   }
 
   Future<bool> isFavorite(String id) async {

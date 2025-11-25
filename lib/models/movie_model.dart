@@ -6,6 +6,12 @@ class Movie {
   final String releaseDate;
   final double voteAverage;
   final String genre;
+  
+  // Additional fields dari API detail
+  final String? director;
+  final List<String>? cast;
+  final String? language;
+  final String? duration;
 
   Movie({
     required this.id,
@@ -15,30 +21,81 @@ class Movie {
     required this.releaseDate,
     required this.voteAverage,
     required this.genre,
+    this.director,
+    this.cast,
+    this.language,
+    this.duration,
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) {
+    // Parse String dengan aman
+    String parseString(dynamic value, String defaultValue) {
+      if (value == null || value == 'empty') return defaultValue;
+      if (value is String) return value;
+      if (value is List && value.isNotEmpty) return value[0].toString();
+      return value.toString();
+    }
+
+    // Parse String nullable
+    String? parseStringNullable(dynamic value) {
+      if (value == null || value == 'empty') return null;
+      if (value is String) return value;
+      if (value is List && value.isNotEmpty) return value[0].toString();
+      return value.toString();
+    }
+
+    // Parse Rating
+    double parseRating(dynamic value) {
+      if (value == null) return 0.0;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? 0.0;
+      return 0.0;
+    }
+
+    // Parse Genre - bisa array atau string
+    String parseGenre(dynamic value) {
+      if (value == null) return 'Unknown';
+      if (value is String) return value;
+      if (value is List && value.isNotEmpty) {
+        return value.map((e) => e.toString()).join(", ");
+      }
+      return value.toString();
+    }
+
+    // Parse Cast - array of strings
+    List<String>? parseCast(dynamic value) {
+      if (value == null) return null;
+      if (value is List) {
+        return value.map((e) => e.toString()).toList();
+      }
+      return null;
+    }
+
+    // PENTING: Field gambar di API adalah "imgUrl" bukan "image"
+    String posterUrl = parseString(
+      json['imgUrl'] ?? json['image'], 
+      'https://via.placeholder.com/300x450/1a1a1a/ffffff?text=No+Image'
+    );
+
+    // PENTING: Deskripsi bisa di "description" atau "overview" atau "synopsis"
+    String description = parseString(
+      json['description'] ?? json['overview'] ?? json['synopsis'],
+      'No Description Available'
+    );
+
     return Movie(
-      // Pakai .toString() di semua field agar aman kalau API kirim Angka/List
-      id: json['id']?.toString() ?? '0',
-      
-      title: json['title']?.toString() ?? 'No Title',
-      
-      // Kadang image dikirim array, kita convert aman ke String
-      posterPath: json['image']?.toString() ?? 'https://via.placeholder.com/300',
-      
-      overview: json['overview']?.toString() ?? 'No Description',
-      
-      releaseDate: json['release_date']?.toString() ?? 'Unknown',
-      
-      voteAverage: double.tryParse(json['rating'].toString()) ?? 0.0,
-      
-      // PERBAIKAN UTAMA DI SINI:
-      // Cek apakah genre itu List? Jika iya, gabung jadi string pake koma.
-      // Jika bukan, jadikan string biasa.
-      genre: (json['genre'] is List)
-          ? (json['genre'] as List).join(", ") // Ubah ["Action", "Horor"] jadi "Action, Horor"
-          : json['genre']?.toString() ?? 'Unknown',
+      id: parseString(json['id'], '0'),
+      title: parseString(json['title'], 'No Title'),
+      posterPath: posterUrl,
+      overview: description,
+      releaseDate: parseString(json['release_date'], 'Unknown'),
+      voteAverage: parseRating(json['rating']),
+      genre: parseGenre(json['genre']),
+      director: parseStringNullable(json['director']),
+      cast: parseCast(json['cast']),
+      language: parseStringNullable(json['language']),
+      duration: parseStringNullable(json['duration']),
     );
   }
 
@@ -51,6 +108,27 @@ class Movie {
       'releaseDate': releaseDate,
       'voteAverage': voteAverage,
       'genre': genre,
+      'director': director,
+      'cast': cast?.join(','),
+      'language': language,
+      'duration': duration,
     };
+  }
+
+  // Constructor dari Map (untuk database)
+  factory Movie.fromMap(Map<String, dynamic> map) {
+    return Movie(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      posterPath: map['posterPath'] as String,
+      overview: map['overview'] as String,
+      releaseDate: map['releaseDate'] as String,
+      voteAverage: map['voteAverage'] as double,
+      genre: map['genre'] as String,
+      director: map['director'] as String?,
+      cast: map['cast'] != null ? (map['cast'] as String).split(',') : null,
+      language: map['language'] as String?,
+      duration: map['duration'] as String?,
+    );
   }
 }
