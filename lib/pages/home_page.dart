@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
     try {
       final movies = await ApiService.getMovies();
       
-      // Extract unique genres
+      
       Set<String> genreSet = {};
       for (var movie in movies) {
         if (movie.genre.contains(',')) {
@@ -118,7 +118,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final Movie? heroMovie = _allMovies.isNotEmpty ? _allMovies.first : null;
+    // by rating
+    final Movie? heroMovie = _allMovies.isNotEmpty 
+        ? _allMovies.reduce((curr, next) => curr.voteAverage > next.voteAverage ? curr : next) 
+        : null;
+
     final displayMovies = _showAllMovies ? _filteredMovies : _filteredMovies.take(10).toList();
 
     return Scaffold(
@@ -163,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
 
-                  // GRADIENT OVERLAY
+                  
                   if (_searchQuery.isEmpty)
                     Positioned(
                       top: 0, left: 0, right: 0, height: 500,
@@ -392,9 +396,9 @@ class _HomePageState extends State<HomePage> {
 
                               const SizedBox(height: 16),
 
-                              // Movie List - Conditional Layout
+                              // list
                               if (_showAllMovies || _searchQuery.isNotEmpty)
-                                // Grid Layout untuk See All
+                                // See All
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 20),
                                   child: GridView.builder(
@@ -426,7 +430,7 @@ class _HomePageState extends State<HomePage> {
                                       return Container(
                                         width: 150,
                                         margin: const EdgeInsets.only(right: 16),
-                                        child: _buildMovieCard(movie),
+                                        child: _buildMovieCard(movie), 
                                       );
                                     },
                                   ),

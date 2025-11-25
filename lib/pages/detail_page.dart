@@ -100,7 +100,7 @@ class _DetailPageState extends State<DetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Movie Poster
+            
             Stack(
               children: [
                 Container(
@@ -164,7 +164,7 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
                 
-                // Back Button
+                
                 Positioned(
                   top: 40,
                   left: 16,
@@ -217,7 +217,7 @@ class _DetailPageState extends State<DetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title & Favorite
+                 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,7 +252,7 @@ class _DetailPageState extends State<DetailPage> {
 
                   const SizedBox(height: 20),
 
-                  // Movie Info Cards
+                  
                   Row(
                     children: [
                       // Rating

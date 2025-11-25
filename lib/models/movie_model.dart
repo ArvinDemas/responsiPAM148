@@ -28,7 +28,7 @@ class Movie {
   });
 
   factory Movie.fromJson(Map<String, dynamic> json) {
-    // Parse String dengan aman
+    
     String parseString(dynamic value, String defaultValue) {
       if (value == null || value == 'empty') return defaultValue;
       if (value is String) return value;
@@ -36,7 +36,7 @@ class Movie {
       return value.toString();
     }
 
-    // Parse String nullable
+  
     String? parseStringNullable(dynamic value) {
       if (value == null || value == 'empty') return null;
       if (value is String) return value;
@@ -44,7 +44,7 @@ class Movie {
       return value.toString();
     }
 
-    // Parse Rating
+    
     double parseRating(dynamic value) {
       if (value == null) return 0.0;
       if (value is double) return value;
@@ -53,7 +53,7 @@ class Movie {
       return 0.0;
     }
 
-    // Parse Genre - bisa array atau string
+    
     String parseGenre(dynamic value) {
       if (value == null) return 'Unknown';
       if (value is String) return value;
@@ -63,7 +63,7 @@ class Movie {
       return value.toString();
     }
 
-    // Parse Cast - array of strings
+    
     List<String>? parseCast(dynamic value) {
       if (value == null) return null;
       if (value is List) {
@@ -72,13 +72,13 @@ class Movie {
       return null;
     }
 
-    // PENTING: Field gambar di API adalah "imgUrl" bukan "image"
+    
     String posterUrl = parseString(
       json['imgUrl'] ?? json['image'], 
       'https://via.placeholder.com/300x450/1a1a1a/ffffff?text=No+Image'
     );
 
-    // PENTING: Deskripsi bisa di "description" atau "overview" atau "synopsis"
+    
     String description = parseString(
       json['description'] ?? json['overview'] ?? json['synopsis'],
       'No Description Available'

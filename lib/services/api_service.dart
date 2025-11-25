@@ -15,7 +15,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         
-        // Filter out invalid data and convert to Movie objects
+        
         List<Movie> movies = [];
         for (var i = 0; i < data.length; i++) {
           try {
@@ -27,7 +27,7 @@ class ApiService {
           } catch (e) {
             print('Error parsing movie ${i + 1}: $e');
             print('Data: ${data[i]}');
-            // Skip this movie and continue with others
+            
             continue;
           }
         }
@@ -51,7 +51,7 @@ class ApiService {
     }
   }
 
-  // Get single movie detail from API
+ 
   static Future<Movie> getMovieById(String id) async {
     try {
       final response = await http.get(

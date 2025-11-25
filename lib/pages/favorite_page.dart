@@ -19,13 +19,13 @@ class _FavoritePageState extends State<FavoritePage> {
   }
 
   void _loadData() async {
-    final data = await DatabaseHelper.instance.getFavorites(); // Load dari DB [cite: 49]
+    final data = await DatabaseHelper.instance.getFavorites(); 
     setState(() => _favorites = data);
   }
 
   void _remove(String id) async {
     await DatabaseHelper.instance.removeFavorite(id);
-    _loadData(); // Refresh list agar item hilang [cite: 48]
+    _loadData(); 
     if(mounted) {
        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Removed"), backgroundColor: Colors.red));
     }
